@@ -126,12 +126,10 @@ def get_argocd_application_url(app_name):
 
 def update_pr(git_provider, git_commit_metadata, pr_comment):
     if 'github' in git_provider:
-        print(git_provider)
         github_pr_url = 'https://api.github.com/repos/' + \
             git_provider['github']['owner'] + '/' + git_provider['github']['repo'] + \
             '/issues/' + \
             git_commit_metadata['pull_request_number'] + '/comments'
-        print(github_pr_url)
         headers = {"Authorization": "token " + GIT_PROVIDER_API_TOKEN,
                    'Content-Type': 'application/json'}
 
@@ -140,8 +138,6 @@ def update_pr(git_provider, git_commit_metadata, pr_comment):
         }
 
         response = requests.post(github_pr_url, headers=headers, json=payload)
-        print(response.status_code)
-
 
 def get_first_column(emoji, text):
     return '\n|<span aria-hidden=\"true\">' + emoji + '</span>  ' + text + ' |  '
