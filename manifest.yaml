@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pull-request-bot
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: pull-request-bot
+rules:
+- apiGroups: [""]
+  resources: ["secrets", "configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["argoproj.io"]
+  resources: ["applications","applicationsets"]
+  verbs: ["list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pull-request-bot
+subjects:
+- kind: ServiceAccount
+  name: pull-request-bot
+roleRef:
+  kind: ClusterRole
+  name: pull-request-bot
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pull-request-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pull-request-bot
+  template:
+    metadata:
+      labels:
+        app: pull-request-bot
+    spec:
+      serviceAccountName: pull-request-bot
+      containers:
+      - name: pull-request-bot
+        image: glueops/pull-request-bot:v0.2.0-alpha-3
