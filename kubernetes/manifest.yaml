@@ -16,15 +16,14 @@ rules:
   verbs: ["list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   name: pull-request-bot
 subjects:
 - kind: ServiceAccount
   name: pull-request-bot
-  namespace: default
 roleRef:
-  kind: ClusterRole
+  kind: Role
   name: pull-request-bot
   apiGroup: rbac.authorization.k8s.io
 ---
