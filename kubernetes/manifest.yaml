@@ -1,4 +1,9 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: glueops-core-pull-request-bot
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: pull-request-bot
