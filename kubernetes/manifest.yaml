@@ -22,6 +22,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: pull-request-bot
+  namespace: default
 roleRef:
   kind: ClusterRole
   name: pull-request-bot
