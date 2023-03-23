@@ -1,0 +1,10 @@
+name: Publish Docker Image to ghcr
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  call-workflow-passing-data:
+    uses: GlueOps/github-workflows/.github/workflows/publish-image-to-ghcr.yml@v0.1.0
+    secrets: inherit
