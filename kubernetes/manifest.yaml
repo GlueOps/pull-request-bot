@@ -51,4 +51,4 @@ spec:
       serviceAccountName: pull-request-bot
       containers:
       - name: pull-request-bot
-        image: ghcr.io/glueops/pull-request-bot:v0.5.2
+        image: ghcr.io/glueops/pull-request-bot:v0.5.3
