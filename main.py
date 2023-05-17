@@ -1,27 +1,47 @@
-import requests
+import base64
+import logging
+import os
 import time
 
+import requests
 from kubernetes import client, config
-import os
-import base64
 
+from src.json_log_formatter import JsonFormatter
+
+
+#=== configure logging
+# json formatter
+json_formatter = JsonFormatter()
+
+# stream handler
+stream_handler = logging.StreamHandler()
+stream_handler.setFormatter(json_formatter)
+stream_handler.setLevel(os.getenv('PYTHON_LOG_LEVEL', 'INFO'))
+
+# configure logger
+logger = logging.getLogger('PULL_REQUEST_BOT')
+logger.setLevel(os.getenv('PYTHON_LOG_LEVEL', 'INFO'))
+logger.addHandler(stream_handler)
 
 try:
     config.load_incluster_config()
 except Exception as e:
-    print("Error loading in-cluster k8s config: {0}".format(e))
+    logger.exception("Error loading in-cluster k8s config")
     config.load_kube_config()
-    print("Using local Kubeconfig (not in-cluster)")
+    logger.info("Using local Kubeconfig (not in-cluster)")
 
 v1 = client.CoreV1Api()
 custom_api = client.CustomObjectsApi()
 
-
-NAMESPACE = os.environ.get('NAMESPACE') or "glueops-core"
-API_TOKEN_K8S_SECRET_NAME = os.environ.get(
-    'API_TOKEN_K8S_SECRET_NAME') or "git-provider-api-token"
-CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.environ.get(
-    'CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME') or "glueops-captain-domain"
+NAMESPACE = os.getenv('NAMESPACE', 'glueops-core')
+API_TOKEN_K8S_SECRET_NAME = os.getenv(
+    'API_TOKEN_K8S_SECRET_NAME',
+    'git-provider-api-token'
+)
+CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.getenv(
+    'CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME',
+    'glueops-captain-domain'
+)
 
 
 def get_api_token():
@@ -59,7 +79,7 @@ def main():
         external_urls = ""
         app_name = ""
         namespace = ""
-#
+
         # Check each new application
         for app in new_apps:
             if app["metadata"]["annotations"]['head_sha'] not in commits_processed:
@@ -93,9 +113,11 @@ def main():
                     commits_processed.append(
                         app["metadata"]["annotations"]['head_sha'])
             else:
-                print("Skipping. Already processed: " + app["metadata"]["name"] +
-                    " " + app["metadata"]["annotations"]['head_sha'])
-            # Sleep for some time before checking again
+                logger.info(
+                    f'Skipping. Already processed: {app["metadata"]["name"]} '
+                    f'{app["metadata"]["annotations"]["head_sha"]}'
+                )
+        # Sleep for some time before checking again
         time.sleep(10)
 
 
