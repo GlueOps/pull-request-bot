@@ -1,2 +1,2 @@
 kubernetes==26.1.0
-requests==2.30.0
+requests==2.31.0
