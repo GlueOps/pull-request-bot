@@ -143,6 +143,9 @@ def main():
                             pr_comment,
                             git_provider_api_token
                         )
+
+                        r.raise_for_status()
+
                         commits_processed.append(
                             app['metadata']['annotations']['head_sha']
                         )
