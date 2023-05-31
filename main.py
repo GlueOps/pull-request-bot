@@ -18,13 +18,14 @@ stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(json_formatter)
 stream_handler.setLevel(os.getenv(
     'PYTHON_LOG_LEVEL',
-    'DEBUG'
+    'INFO'
 ))
 
 # configure logger
 logger = logging.getLogger('PULL_REQUEST_BOT')
 logger.setLevel(os.getenv(
-    'PYTHON_LOG_LEVEL', 'DEBUG'
+    'PYTHON_LOG_LEVEL',
+    'INFO'
 ))
 logger.addHandler(stream_handler)
 
