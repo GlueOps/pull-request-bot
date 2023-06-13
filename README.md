@@ -28,6 +28,10 @@ data:
 
 ## Integrating the QR code generator
 The code to generate the QR code is in the ```qr-generator.py``` file.
+
+To run as a single service:
+
 ```python
+pip install -r requirements.txt
 python qr-generator.py
 ```
