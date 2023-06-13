@@ -8,6 +8,7 @@ from kubernetes import client, config
 from src.get_github_api_token import get_github_api_token
 from src.json_log_formatter import JsonFormatter
 
+import qrcode
 
 #=== configure logging
 # json formatter
@@ -209,6 +210,10 @@ def update_pr(git_provider, git_commit_metadata, pr_comment, git_provider_api_to
 def get_first_column(emoji, text):
     return '\n|<span aria-hidden=\"true\">' + emoji + '</span>  ' + text + ' |  '
 
+#Generate QR Code
+def generate_qr_code(url):
+    img = qrcode.make(url)
+    img.save("img.png")
 
 def get_comment(git_commit_metadata, app_name, app_argocd_url, external_urls, app_logs_url, app_metrics_url):
       body = '|  Name | Link |\n|---------------------------------|------------------------|'
@@ -217,8 +222,12 @@ def get_comment(git_commit_metadata, app_name, app_argocd_url, external_urls, ap
       body += get_first_column("🖥️", "Deployment Preview") + '[' + external_urls[0] + '](' + external_urls[0] + ') |'
       body += get_first_column("📊", "Metrics") + '[Grafana](' + app_metrics_url + ') |'
       body += get_first_column("📜", "Logs") + '[Loki](' + app_logs_url + ') |'
-      body += get_first_column("📱", "Preview on mobile") + '<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + external_urls[0] + '">|'
+      generate_qr_code(external_urls[0])
+      body += get_first_column("📱", "Preview on mobile") + '![QR Code](img.png)|'
+      
       return body
+    #   body += get_first_column("📱", "Preview on mobile") + '<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' + external_urls[0] + '">|'
+    #   return body
 
 if __name__ == '__main__':
     main()

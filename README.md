@@ -25,3 +25,9 @@ data:
   captain_domain: <example: nonprod.tenant.glueopshosted.rocks>
 ---
 ```
+
+## Integrating the QR code generator
+The code to generate the QR code is in the ```qr-generator.py``` file.
+```python
+python qr-generator.py
+```
