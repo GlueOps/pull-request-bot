@@ -106,7 +106,13 @@ def main():
                 if appset_created:
                     appset_name = app['metadata']['ownerReferences'][0]['name']
                     git_commit_metadata = app['metadata']['annotations']
-                    git_provider = git_provider_info(appset_name)
+
+                    git_provider = {
+                        "github": {
+                            "repo": git_commit_metadata["repository_name"],
+                            "owner": git_commit_metadata["repository_organization"]
+                        }
+                    }
 
                 # Check if the application has an external URL defined in its status
                 if app.get('status', {}).get('summary', {}).get('externalURLs', []):
@@ -160,19 +166,6 @@ def main():
                 )
         # Sleep for some time before checking again
         time.sleep(10)
-
-
-def git_provider_info(appset_name):
-    apps_sets = custom_api.list_cluster_custom_object(
-        'argoproj.io',
-        'v1alpha1',
-        'applicationsets'
-    )
-    for app_set in apps_sets['items']:
-        if app_set['metadata']['name'] == appset_name:
-            if 'pullRequest' in app_set['spec']['generators'][0]:
-                return app_set['spec']['generators'][0]['pullRequest']
-
 
 def get_grafana_url_prefix():
     return "https://grafana." + CAPTAIN_DOMAIN
