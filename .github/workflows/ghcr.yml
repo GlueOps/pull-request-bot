@@ -1,10 +1,10 @@
-name: Publish Docker Image to ghcr
-
-on:
-  release:
-    types: [published]
+name: Build, Tag and Publish Docker image to ghcr.io
+ 
+on: [push]
 
 jobs:
-  call-workflow-passing-data:
-    uses: GlueOps/github-workflows/.github/workflows/publish-image-to-ghcr.yml@main
-    secrets: inherit
+  build_tag_push_to_ghcr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build, Tag and Push Docker Image to GHCR
+        uses: GlueOps/github-actions-build-push-containers@v0.1.1
