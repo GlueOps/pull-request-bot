@@ -1,4 +1,2 @@
 config
 __pycache__
-*.png
-venv
