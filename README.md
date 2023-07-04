@@ -26,21 +26,7 @@ data:
 ---
 ```
 
-## Integrating the QR code generator
-
-The code to generate the QR code is in the ```qr-generator.py``` file.
-
-To run as a single service:
-
-- Development environment
-
-```python
-uvicorn qr-generator:app --reload
-```
-
-- Ensure [public](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/restricting-the-visibility-of-forwarded-ports#overview) port forwarding in codespace.
-
-## Running the file
+## Running the main.py file
 
 - Ensure you have the following set in your ```.env``` file (at root foolder):
 
