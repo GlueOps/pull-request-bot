@@ -5,6 +5,9 @@ import time
 import requests
 from kubernetes import client, config
 
+from src.get_github_api_token import get_github_api_token
+from src.json_log_formatter import JsonFormatter
+
 #=== configure logging
 # json formatter
 json_formatter = JsonFormatter()
