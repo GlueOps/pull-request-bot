@@ -26,11 +26,21 @@ data:
 ---
 ```
 
-## Running the main.py file
+## Running the app
 
-- Ensure you have the following set in your ```.env``` file (at root foolder):
+- Ensure you have the following set in your ```.env``` file (at **root** foolder):
 
 ```bash
 export GITHUB_TOKEN=<some-value>
 aws eks update-kubeconfig --region us-west-2 --name captain-cluster --role-arn arn:aws:iam::<some-value>:role/captain-role
+```
+
+- Create a ```.env``` file and fill in the following (where your ```main.py``` file is)
+```bash
+DOMAIN=<your-captain-domain>
+```
+
+- Then run
+```python
+python main.py
 ```
