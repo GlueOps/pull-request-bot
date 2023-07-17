@@ -13,7 +13,7 @@ from src.json_log_formatter import JsonFormatter
 load_dotenv()
 
 # Get the environment variable
-domain = os.getenv("DOMAIN")
+CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.getenv("DOMAIN")
 
 #=== configure logging
 # json formatter
@@ -215,7 +215,7 @@ def get_comment(git_commit_metadata, app_name, app_argocd_url, external_urls, ap
     body += get_first_column("🖥️", "Deployment Preview") + '[' + external_urls[0] + '](' + external_urls[0] + ') |'
     body += get_first_column("📊", "Metrics") + '[Grafana](' + app_metrics_url + ') |'
     body += get_first_column("📜", "Logs") + '[Loki](' + app_logs_url + ') |'
-    qr_code_url = f'https://qr-code-generator.{domain}/v1/qr?url={external_urls[0]}'
+    qr_code_url = f'https://qr-code-generator.{CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME}/v1/qr?url={external_urls[0]}'
     body += get_first_column("📱", "Preview on mobile") + f'<img src="{qr_code_url}" width="150" height="150">|'
 
 
