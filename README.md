@@ -32,8 +32,5 @@ data:
 
 ```bash
 export GITHUB_TOKEN=<some-value>
-export AWS_ACCESS_KEY_ID=<some-value>
-export AWS_SECRET_ACCESS_KEY=<some-value>
-export AWS_DEFAULT_REGION=<some-value>
 aws eks update-kubeconfig --region us-west-2 --name captain-cluster --role-arn arn:aws:iam::<some-value>:role/captain-role
 ```
