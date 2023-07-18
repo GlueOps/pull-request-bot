@@ -33,12 +33,8 @@ data:
 ```bash
 export GITHUB_TOKEN=<some-value>
 ```
-For cloud specific setup (to be authenticated to the captain cluster), check [here](https://github.com/GlueOps/terraform-module-cloud-aws-kubernetes-cluster/wiki)
 
-- Create a ```.env``` file and fill in the following (where your ```main.py``` file is)
-```bash
-DOMAIN=<your-captain-domain>
-```
+For cloud specific setup (to be authenticated to the captain cluster), check [here](https://github.com/GlueOps/terraform-module-cloud-aws-kubernetes-cluster/wiki)
 
 - Then run
 ```python
