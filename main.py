@@ -54,8 +54,7 @@ GITHUB_APP_SECRET_NAME = os.getenv(
 )
 CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.getenv(
     'CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME',
-    'glueops-captain-domain',
-
+    'glueops-captain-domain'
 )
 
 
