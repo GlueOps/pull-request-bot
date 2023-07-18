@@ -37,6 +37,7 @@ export GITHUB_TOKEN=<some-value>
 For cloud specific setup (to be authenticated to the captain cluster), check [here](https://github.com/GlueOps/terraform-module-cloud-aws-kubernetes-cluster/wiki)
 
 - Then run
+
 ```python
 python main.py
 ```
