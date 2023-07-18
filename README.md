@@ -32,8 +32,8 @@ data:
 
 ```bash
 export GITHUB_TOKEN=<some-value>
-aws eks update-kubeconfig --region us-west-2 --name captain-cluster --role-arn arn:aws:iam::<some-value>:role/captain-role
 ```
+For cloud specific setup (to be authenticated to the captain cluster), check [here](https://github.com/GlueOps/terraform-module-cloud-aws-kubernetes-cluster/wiki)
 
 - Create a ```.env``` file and fill in the following (where your ```main.py``` file is)
 ```bash
