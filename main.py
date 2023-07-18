@@ -15,6 +15,7 @@ load_dotenv()
 # Get the environment variable
 CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.getenv("DOMAIN")
 
+
 #=== configure logging
 # json formatter
 json_formatter = JsonFormatter()
