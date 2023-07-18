@@ -25,3 +25,19 @@ data:
   captain_domain: <example: nonprod.tenant.glueopshosted.rocks>
 ---
 ```
+
+## Running the app
+
+- Ensure you have the following set in your ```.env``` file (at **root** foolder):
+
+```bash
+export GITHUB_TOKEN=<some-value>
+```
+
+For cloud specific setup (to be authenticated to the captain cluster), check [here](https://github.com/GlueOps/terraform-module-cloud-aws-kubernetes-cluster/wiki)
+
+- Then run
+
+```python
+python main.py
+```
