@@ -166,11 +166,11 @@ def main():
                             except:
                                 logger.exception(f'Failed to process pr comment: {r.json()}')
 
-            else:
-                logger.info(
-                    f'Skipping. Already processed: {app["metadata"]["name"]} '
-                    f'{app["metadata"]["annotations"]["head_sha"]}'
-                )
+                    else:
+                        logger.info(
+                            f'Skipping. Already processed: {app["metadata"]["name"]} '
+                            f'{app["metadata"]["annotations"]["head_sha"]}'
+                        )
         # Sleep for some time before checking again
         time.sleep(10)
 
