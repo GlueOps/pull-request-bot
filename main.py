@@ -95,9 +95,12 @@ def main():
         for app in new_apps:
             if 'preview_environment' in app['metadata']['annotations']:
                 logger.info(
-                    f'Skipping. {app["metadata"]["name"]}'
+                    f'This has a preview environment annotation: {app["metadata"]["name"]}'
                 )
                 if app['metadata']['annotations']['preview_environment'] == 'true':
+                    logger.info(
+                        f'This has a preview environment annotation and is indeed a preview environment: {app["metadata"]["name"]}'
+                    )
                     if app['metadata']['annotations']['head_sha'] not in commits_processed:
                         # Check if the application was created by an ApplicationSet
                         owner_refs = app['metadata']['ownerReferences']
