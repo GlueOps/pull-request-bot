@@ -93,76 +93,81 @@ def main():
 
         # Check each new application
         for app in new_apps:
-            if app['metadata']['annotations']['head_sha'] not in commits_processed:
-                # Check if the application was created by an ApplicationSet
-                owner_refs = app['metadata']['ownerReferences']
-                appset_created = any(
-                    ref['kind'] == 'ApplicationSet' for ref in owner_refs
-                )
-                app_name = app['metadata']['name']
-                namespace = app['spec']['destination']['namespace']
-                # if the app was created by an ApplicationSet, get the ApplicationSet name and git commit metadata
-                if appset_created:
-                    appset_name = app['metadata']['ownerReferences'][0]['name']
-                    git_commit_metadata = app['metadata']['annotations']
+            if app['metadata']['annotations'].get('preview_environment') == 'true':
+                logger.info(f'OK. This app has the annotation preview_environment == true : {app["metadata"]["name"]}')
+                if app['metadata']['annotations']['head_sha'] not in commits_processed:
+                    # Check if the application was created by an ApplicationSet
+                    owner_refs = app['metadata']['ownerReferences']
+                    appset_created = any(
+                        ref['kind'] == 'ApplicationSet' for ref in owner_refs
+                    )
+                    app_name = app['metadata']['name']
+                    namespace = app['spec']['destination']['namespace']
+                    # if the app was created by an ApplicationSet, get the ApplicationSet name and git commit metadata
+                    if appset_created:
+                        appset_name = app['metadata']['ownerReferences'][0]['name']
+                        git_commit_metadata = app['metadata']['annotations']
 
-                    git_provider = {
-                        "github": {
-                            "repo": git_commit_metadata["repository_name"],
-                            "owner": git_commit_metadata["repository_organization"]
+                        git_provider = {
+                            "github": {
+                                "repo": git_commit_metadata["repository_name"],
+                                "owner": git_commit_metadata["repository_organization"]
+                            }
                         }
-                    }
 
-                # Check if the application has an external URL defined in its status
-                if app.get('status', {}).get('summary', {}).get('externalURLs', []):
-                    external_urls = app['status']['summary']['externalURLs']
-                    has_external_url = any(url for url in external_urls)
-                else:
-                    has_external_url = False
+                    # Check if the application has an external URL defined in its status
+                    if app.get('status', {}).get('summary', {}).get('externalURLs', []):
+                        external_urls = app['status']['summary']['externalURLs']
+                        has_external_url = any(url for url in external_urls)
+                    else:
+                        has_external_url = False
 
-                if has_external_url:
-                    app_logs_url = get_grafana_url_loki(app_name)
-                    app_metrics_url = get_grafana_url_metrics(
-                        namespace,
-                        app_name
-                    )
-                    app_argocd_url = get_argocd_application_url(app_name)
-                    
-                    pr_comment = get_comment(
-                        git_commit_metadata,
-                        app_name,
-                        app_argocd_url,
-                        external_urls,
-                        app_logs_url,
-                        app_metrics_url
-                    )
-                    git_provider_api_token = get_github_api_token(
-                        k8s_v1_api=v1,
-                        secret_name=GITHUB_APP_SECRET_NAME,
-                        secret_namespace=NAMESPACE
-                    )         
-                    try:
-                        r = update_pr(
-                            git_provider,
+                    if has_external_url:
+                        app_logs_url = get_grafana_url_loki(app_name)
+                        app_metrics_url = get_grafana_url_metrics(
+                            namespace,
+                            app_name
+                        )
+                        app_argocd_url = get_argocd_application_url(app_name)
+                        
+                        pr_comment = get_comment(
                             git_commit_metadata,
-                            pr_comment,
-                            git_provider_api_token
+                            app_name,
+                            app_argocd_url,
+                            external_urls,
+                            app_logs_url,
+                            app_metrics_url
                         )
+                        git_provider_api_token = get_github_api_token(
+                            k8s_v1_api=v1,
+                            secret_name=GITHUB_APP_SECRET_NAME,
+                            secret_namespace=NAMESPACE
+                        )         
+                        try:
+                            r = update_pr(
+                                git_provider,
+                                git_commit_metadata,
+                                pr_comment,
+                                git_provider_api_token
+                            )
 
-                        r.raise_for_status()
+                            r.raise_for_status()
 
-                        commits_processed.append(
-                            app['metadata']['annotations']['head_sha']
-                        )
-                        logger.debug(f'updated pr comment: {r.json()}')
-                    except:
-                        logger.exception(f'Failed to process pr comment: {r.json()}')
+                            commits_processed.append(
+                                app['metadata']['annotations']['head_sha']
+                            )
+                            logger.debug(f'updated pr comment: {r.json()}')
+                            logger.info(f'SUCCESS. Just processed PR comment for: {app["metadata"]["name"]}')
+                        except:
+                            logger.exception(f'Failed to process pr comment: {r.json()}')
 
+                else:
+                    logger.info(
+                        f'Skipping. Already processed: {app["metadata"]["name"]} '
+                        f'{app["metadata"]["annotations"]["head_sha"]}'
+                    )
             else:
-                logger.info(
-                    f'Skipping. Already processed: {app["metadata"]["name"]} '
-                    f'{app["metadata"]["annotations"]["head_sha"]}'
-                )
+                logger.info(f'SKIPPING. This app does not have the annotation preview_environment == true : {app["metadata"]["name"]}')
         # Sleep for some time before checking again
         time.sleep(10)
 
