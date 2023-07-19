@@ -94,9 +94,7 @@ def main():
         # Check each new application
         for app in new_apps:
             if app['metadata']['annotations'].get('preview_environment') == 'true':
-                logger.info(
-                    f'OK. This app has the annotation preview_environment == true : {app["metadata"]["name"]}'
-                )
+                logger.info(f'OK. This app has the annotation preview_environment == true : {app["metadata"]["name"]}')
                 if app['metadata']['annotations']['head_sha'] not in commits_processed:
                     # Check if the application was created by an ApplicationSet
                     owner_refs = app['metadata']['ownerReferences']
@@ -159,6 +157,7 @@ def main():
                                 app['metadata']['annotations']['head_sha']
                             )
                             logger.debug(f'updated pr comment: {r.json()}')
+                            logger.info(f'SUCCESS. Just processed PR comment for: {app["metadata"]["name"]}')
                         except:
                             logger.exception(f'Failed to process pr comment: {r.json()}')
 
@@ -168,9 +167,7 @@ def main():
                         f'{app["metadata"]["annotations"]["head_sha"]}'
                     )
             else:
-                logger.info(
-                    f'SKIPPING. This app does not have the annotation preview_environment == true : {app["metadata"]["name"]}'
-                )
+                logger.info(f'SKIPPING. This app does not have the annotation preview_environment == true : {app["metadata"]["name"]}')
         # Sleep for some time before checking again
         time.sleep(10)
 
