@@ -94,6 +94,9 @@ def main():
         # Check each new application
         for app in new_apps:
             if 'preview_environment' in app['metadata']['annotations']:
+                logger.info(
+                    f'Skipping. {app["metadata"]["name"]}'
+                )
                 if app['metadata']['annotations']['preview_environment'] == 'true':
                     if app['metadata']['annotations']['head_sha'] not in commits_processed:
                         # Check if the application was created by an ApplicationSet
