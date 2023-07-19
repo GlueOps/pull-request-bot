@@ -95,7 +95,7 @@ def main():
         for app in new_apps:
             if app['metadata']['annotations'].get('preview_environment') == 'true':
                 logger.info(
-                    f'OK. This has the annotation preview_environment == true : {app["metadata"]["name"]}'
+                    f'OK. This app has the annotation preview_environment == true : {app["metadata"]["name"]}'
                 )
                 if app['metadata']['annotations']['head_sha'] not in commits_processed:
                     # Check if the application was created by an ApplicationSet
