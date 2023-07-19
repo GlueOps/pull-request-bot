@@ -1,6 +1,5 @@
-FROM python:3.11.3
+FROM python:3.11.4-slim-bullseye
 
-RUN pip install --upgrade pip
 COPY requirements.txt /app/requirements.txt
 WORKDIR /app
 RUN pip install -r requirements.txt
