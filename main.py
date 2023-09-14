@@ -56,6 +56,10 @@ CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME = os.getenv(
     'CAPTAIN_DOMAIN_K8S_CONFIGMAP_NAME',
     'glueops-captain-domain'
 )
+WATCH_FOR_APPS_DELAY_SECONDS =int(os.getenv(
+    'WATCH_FOR_APPS_DELAY_SECONDS',
+    '10'
+))
 
 
 def get_captain_domain():
@@ -169,7 +173,7 @@ def main():
             else:
                 logger.info(f'SKIPPING. This app does not have the annotation preview_environment == true : {app["metadata"]["name"]}')
         # Sleep for some time before checking again
-        time.sleep(10)
+        time.sleep(WATCH_FOR_APPS_DELAY_SECONDS)
 
 def get_grafana_url_prefix():
     return "https://grafana." + CAPTAIN_DOMAIN
