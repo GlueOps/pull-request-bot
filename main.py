@@ -16,7 +16,7 @@ json_formatter = JsonFormatter()
 stream_handler = logging.StreamHandler()
 stream_handler.setFormatter(json_formatter)
 stream_handler.setLevel(os.getenv(
-    'PYTHON_LOG_LEVEL',
+    'PYTHON_LOG_LEVEL',ss
     'INFO'
 ))
 
