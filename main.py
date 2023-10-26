@@ -1,32 +1,17 @@
-import logging
 import os
 import time
 
 import requests
+from glueops.setup_logging import configure as go_configure_logging
 from kubernetes import client, config
 
 from src.get_github_api_token import get_github_api_token
-from src.json_log_formatter import JsonFormatter
 
 #=== configure logging
-# json formatter
-json_formatter = JsonFormatter()
-
-# stream handler
-stream_handler = logging.StreamHandler()
-stream_handler.setFormatter(json_formatter)
-stream_handler.setLevel(os.getenv(
-    'PYTHON_LOG_LEVEL',
-    'INFO'
-))
-
-# configure logger
-logger = logging.getLogger('PULL_REQUEST_BOT')
-logger.setLevel(os.getenv(
-    'PYTHON_LOG_LEVEL',
-    'INFO'
-))
-logger.addHandler(stream_handler)
+logger = go_configure_logging(
+    name='PULL_REQUEST_BOT',
+    level=os.getenv('PYTHON_LOG_LEVEL', 'INFO')
+)
 
 # setting cluster config
 try:
