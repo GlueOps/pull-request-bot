@@ -3,7 +3,7 @@ import time
 
 import requests
 from glueops.setup_logging import configure as go_configure_logging
-from kubernetes import client, config
+import glueops.setup_kubernetes
 
 from src.get_github_api_token import get_github_api_token
 
@@ -14,19 +14,8 @@ logger = go_configure_logging(
 )
 
 # setting cluster config
-try:
-    config.load_incluster_config()
-except Exception as e:
-    logger.warning(f'Error loading in-cluster k8s config: {e}')
-    try:
-        logger.info('Using local Kubeconfig (not in-cluster)')
-        config.load_kube_config()
-    except Exception:
-        logger.exception('Failed to load Kubeconfig from cluster, local file')
+v1, custom_api = glueops.setup_kubernetes.load_kubernetes_config(logger)
 
-# configure kubernetes api clients
-v1 = client.CoreV1Api()
-custom_api = client.CustomObjectsApi()
 
 # set app constants
 NAMESPACE = os.getenv(
