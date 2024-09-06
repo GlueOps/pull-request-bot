@@ -74,7 +74,6 @@ def main():
             if app['metadata']['annotations'].get('preview_environment') == 'true':
                 logger.info(f'OK. This app has the annotation preview_environment == true : {app["metadata"]["name"]}')
                 if app['metadata']['annotations']['head_sha'] not in commits_processed:
-                    time.sleep(30)
                     # Check if the application was created by an ApplicationSet
                     owner_refs = app['metadata']['ownerReferences']
                     appset_created = any(
@@ -93,53 +92,59 @@ def main():
                                 "owner": git_commit_metadata["repository_organization"]
                             }
                         }
-
-                    # Check if the application has an external URL defined in its status
-                    if app.get('status', {}).get('summary', {}).get('externalURLs', []):
-                        external_urls = app['status']['summary']['externalURLs']
-                        has_external_url = any(url for url in external_urls)
-                    else:
-                        has_external_url = False
-
-                    if has_external_url:
-                        app_logs_url = get_grafana_url_loki(app_name)
-                        app_metrics_url = get_grafana_url_metrics(
-                            namespace,
-                            app_name
-                        )
-                        app_argocd_url = get_argocd_application_url(app_name)
                         
-                        pr_comment = get_comment(
-                            git_commit_metadata,
-                            app_name,
-                            app_argocd_url,
-                            external_urls,
-                            app_logs_url,
-                            app_metrics_url
-                        )
-                        git_provider_api_token = get_github_api_token(
-                            k8s_v1_api=v1,
-                            secret_name=GITHUB_APP_SECRET_NAME,
-                            secret_namespace=NAMESPACE
-                        )         
-                        try:
-                            r = update_pr(
-                                git_provider,
-                                git_commit_metadata,
-                                pr_comment,
-                                git_provider_api_token
-                            )
+                    if app.get('status', {}).get('sync', {}).get('revisions', []):
+                        if app['metadata']['annotations']['head_sha'] in app['status']['sync']['revisions']:
+                            # Confirm the App is either finished in a Healthy/Degraded state before grabbing URLs/etc. from it
+                            if app.get('status', {}).get('health', {}).get('status', ""):
+                                if app['status']['health']['status'] in ['Healthy', 'Degraded']:
+                                    # Check if the application has an external URL defined in its status
+                                    if app.get('status', {}).get('summary', {}).get('externalURLs', []):
+                                        external_urls = app['status']['summary']['externalURLs']
+                                        has_external_url = any(url for url in external_urls)
+                                    else:
+                                        has_external_url = False
 
-                            r.raise_for_status()
+                                    if has_external_url:
+                                        app_logs_url = get_grafana_url_loki(app_name)
+                                        app_metrics_url = get_grafana_url_metrics(
+                                            namespace,
+                                            app_name
+                                        )
+                                        app_argocd_url = get_argocd_application_url(app_name)
+                                        
+                                        pr_comment = get_comment(
+                                            git_commit_metadata,
+                                            app_name,
+                                            app_argocd_url,
+                                            external_urls,
+                                            app_logs_url,
+                                            app_metrics_url
+                                        )
+                                        git_provider_api_token = get_github_api_token(
+                                            k8s_v1_api=v1,
+                                            secret_name=GITHUB_APP_SECRET_NAME,
+                                            secret_namespace=NAMESPACE
+                                        )         
+                                        try:
+                                            r = update_pr(
+                                                git_provider,
+                                                git_commit_metadata,
+                                                pr_comment,
+                                                git_provider_api_token
+                                            )
 
-                            commits_processed.append(
-                                app['metadata']['annotations']['head_sha']
-                            )
-                            logger.debug(f'updated pr comment: {r.json()}')
-                            logger.info(f'SUCCESS. Just processed PR comment for: {app["metadata"]["name"]}')
-                        except:
-                            logger.exception(f'Failed to process pr comment: {r.json()}')
+                                            r.raise_for_status()
 
+                                            commits_processed.append(
+                                                app['metadata']['annotations']['head_sha']
+                                            )
+                                            logger.debug(f'updated pr comment: {r.json()}')
+                                            logger.info(f'SUCCESS. Just processed PR comment for: {app["metadata"]["name"]}')
+                                        except:
+                                            logger.exception(f'Failed to process pr comment: {r.json()}')
+                        else:
+                            logger.info(f'Still waiting for kubernetes to start processing: {app["metadata"]["name"]}. Will try again in {WATCH_FOR_APPS_DELAY_SECONDS}s')
                 else:
                     logger.info(
                         f'Skipping. Already processed: {app["metadata"]["name"]} '
@@ -189,13 +194,22 @@ def get_comment(git_commit_metadata, app_name, app_argocd_url, external_urls, ap
     body = '|  Name | Link |\n|---------------------------------|------------------------|'
     body += get_first_column("🔨", "Latest commit") + git_commit_metadata['head_sha'] + ' |'
     body += get_first_column("🦄", "Deployment Details") + '[ArgoCD](' + app_argocd_url + ') |'
-    body += get_first_column("🖥️", "Deployment Preview") + '[' + external_urls[0] + '](' + external_urls[0] + ') |'
+    body += get_first_column("🖥️", "Deployment Preview") + get_all_urls(external_urls) + '|'
     body += get_first_column("📊", "Metrics") + '[Grafana](' + app_metrics_url + ') |'
     body += get_first_column("📜", "Logs") + '[Loki](' + app_logs_url + ') |'
-    qr_code_url = f'https://qr-code-generator.{get_captain_domain()}/v1/qr?url={external_urls[0]}'
-    body += get_first_column("📱", "Preview on mobile") + f'<img src="{qr_code_url}" width="150" height="150">|'
 
     return body
+
+def get_all_urls(external_urls):
+    qr_code_url = f'https://qr-code-generator.{get_captain_domain()}/v1/qr?url='
+    deployment_previews = ''
+    for url in external_urls:
+        deployment_previews += f'<details><summary>{url}</summary><br><img src="{qr_code_url}{url}" width="100" height="100"></details>'
+    
+    if deployment_previews == '':
+        deployment_previews = "Not available. No Ingress was configured."
+    
+    return deployment_previews
 
 
 if __name__ == '__main__':
