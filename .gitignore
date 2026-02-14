@@ -1,2 +1,9 @@
-config
-__pycache__
+**/.DS_Store
+**/*_test.go
+**/*.md
+bin/
+dist/
+tmp/
+vendor/
+.env
+.idea/
