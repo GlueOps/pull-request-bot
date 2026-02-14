@@ -1,11 +1,21 @@
-FROM python:3.14.3-alpine@sha256:faee120f7885a06fcc9677922331391fa690d911c020abb9e8025ff3d908e510
+# ---- build stage ----
+FROM golang:1.25-alpine AS builder
 
-RUN pip install --upgrade pip
+WORKDIR /src
 
-COPY requirements.txt /app/requirements.txt
-WORKDIR /app
-RUN pip install -r requirements.txt
-COPY main.py /app/main.py
-COPY ./src /app/src
+COPY go.mod go.sum ./
+RUN go mod download
 
-CMD [ "python", "-u", "main.py" ]
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -trimpath -ldflags="-s -w" -o /out/pr-bot .
+
+# ---- runtime stage ----
+FROM gcr.io/distroless/static-debian12:nonroot
+
+WORKDIR /
+
+COPY --from=build /out/pr-bot /pr-bot
+
+# No port needed; it runs as a worker
+ENTRYPOINT ["/pr-bot"]
