@@ -4,7 +4,7 @@ FROM golang:1.26-alpine@sha256:d4c4845f5d60c6a974c6000ce58ae079328d03ab7f721a073
 WORKDIR /src
 
 COPY . .
-RUN go mod download
+RUN go mod tidy
 
 RUN go build -trimpath -ldflags="-s -w" -o /out/pr-bot .
 
