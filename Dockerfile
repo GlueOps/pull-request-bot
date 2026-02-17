@@ -13,7 +13,7 @@ FROM gcr.io/distroless/static-debian12:nonroot@sha256:a9329520abc449e3b14d5bc3a6
 
 WORKDIR /
 
-COPY --from=build /out/pr-bot /pr-bot
+COPY --from=builder /out/pr-bot /pr-bot
 
 # No port needed; it runs as a worker
 ENTRYPOINT ["/pr-bot"]
