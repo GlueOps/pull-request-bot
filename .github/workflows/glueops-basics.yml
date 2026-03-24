@@ -10,5 +10,5 @@ on:
 
 jobs:
   PR_CHECKS_AND_LABELS:
-    uses: GlueOps/github-workflows/.github/workflows/glueops-basic-pr-checks.yml@main
+    uses: GlueOps/github-workflows/.github/workflows/glueops-basic-pr-checks.yml@536dd7ba5e206a5a9ba4c01b0b5fc15aa5f5690a # main
     secrets: inherit
